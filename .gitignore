@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.eggs/
+*.log
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Test / Debug / Archive
+*.zip
+*.tar.gz
+*.bak
+
+# Home Assistant
+home-assistant.log
+home-assistant_v2.db

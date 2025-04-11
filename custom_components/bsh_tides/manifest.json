@@ -1,0 +1,17 @@
+{
+  "domain": "bsh_tides",
+  "name": "BSH Tides for Germany",
+  "codeowners": [
+    "@EnlightningMan"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/EnlightningMan/bsh_tides",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "quality_scale": "bronze",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
+  "version": "0.0.1"
+}
