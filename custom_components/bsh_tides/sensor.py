@@ -69,6 +69,11 @@ class BshBaseSensor(CoordinatorEntity, SensorEntity):
         # The _attr_has_entity_name is decisive for having nicely combined entity names like "sensor.bsh_eider_sperrwerk_aussenpegel_mean_high_water_level"
         # instead of just sensor.mean_high_water_level which would be ambiguous for multiple entities.
         self._attr_has_entity_name = True
+        _LOGGER.debug(
+            "Initialized sensor with translation_key=%s, seo_id=%s",
+            translation_key,
+            coordinator.seo_id,
+        )
 
     @property
     def unique_id(self):
@@ -90,6 +95,7 @@ class BshNextTideTimeSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if ts > now:
+                _LOGGER.debug("%s: Next tide time is %s", self.unique_id, ts)
                 return ts
         return None
 
@@ -110,7 +116,18 @@ class BshNextTideLevelSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if ts > now:
-                return round(item["value"]) if item["value"] is not None else None
+                value = item["value"]
+                try:
+                    level = round(float(value)) if value not in (None, "") else None
+                except (TypeError, ValueError):
+                    _LOGGER.warning(
+                        "%s: Invalid value for next tide level: %s",
+                        self.unique_id,
+                        value,
+                    )
+                    return None
+                _LOGGER.debug("%s: Next tide level is %s cm", self.unique_id, level)
+                return level
         return None
 
 
@@ -131,14 +148,19 @@ class BshNextTideDiffSensor(BshBaseSensor):
             if ts > now:
                 try:
                     # cleanup values: "+/-0,0 m", "-0,1 m", "+0,2 m"
-                    return float(
+                    value = float(
                         item["forecast"]
                         .replace(",", ".")
-                        .replace("+", "")
                         .replace("+/-", "")
+                        .replace("+", "")
                         .replace(" m", "")
                     )
-                except Exception:
+                    _LOGGER.debug("%s: Next tide diff is %s m", self.unique_id, value)
+                    return value
+                except Exception as e:
+                    _LOGGER.warning(
+                        "%s: Failed to parse next tide diff: %s", self.unique_id, e
+                    )
                     return None
         return None
 
@@ -156,6 +178,7 @@ class BshNextHighTideTimeSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if item["event"] == "HW" and ts > now:
+                _LOGGER.debug("%s: Next high tide time is %s", self.unique_id, ts)
                 return ts
         return None
 
@@ -177,14 +200,21 @@ class BshNextHighTideDiffSensor(BshBaseSensor):
             if item["event"] == "HW" and ts > now:
                 try:
                     # cleanup values: "+/-0,0 m", "-0,1 m", "+0,2 m"
-                    return float(
+                    value = float(
                         item["forecast"]
                         .replace(",", ".")
-                        .replace("+", "")
                         .replace("+/-", "")
+                        .replace("+", "")
                         .replace(" m", "")
                     )
-                except Exception:
+                    _LOGGER.debug(
+                        "%s: Next high tide diff is %s m", self.unique_id, value
+                    )
+                    return value
+                except Exception as e:
+                    _LOGGER.warning(
+                        "%s: Failed to parse high tide diff: %s", self.unique_id, e
+                    )
                     return None
         return None
 
@@ -205,7 +235,20 @@ class BshNextHighTideLevelSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if item["event"] == "HW" and ts > now:
-                return round(item["value"]) if item["value"] is not None else None
+                value = item["value"]
+                try:
+                    level = round(float(value)) if value not in (None, "") else None
+                except (TypeError, ValueError):
+                    _LOGGER.warning(
+                        "%s: Invalid value for high tide level: %s",
+                        self.unique_id,
+                        value,
+                    )
+                    return None
+                _LOGGER.debug(
+                    "%s: Next high tide level is %s cm", self.unique_id, level
+                )
+                return level
         return None
 
 
@@ -222,6 +265,7 @@ class BshNextLowTideTimeSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if item["event"] == "NW" and ts > now:
+                _LOGGER.debug("%s: Next low tide time is %s", self.unique_id, ts)
                 return ts
         return None
 
@@ -243,14 +287,21 @@ class BshNextLowTideDiffSensor(BshBaseSensor):
             if item["event"] == "NW" and ts > now:
                 try:
                     # cleanup values: "+/-0,0 m", "-0,1 m", "+0,2 m"
-                    return float(
+                    value = float(
                         item["forecast"]
                         .replace(",", ".")
-                        .replace("+", "")
                         .replace("+/-", "")
+                        .replace("+", "")
                         .replace(" m", "")
                     )
-                except Exception:
+                    _LOGGER.debug(
+                        "%s: Next low tide diff is %s m", self.unique_id, value
+                    )
+                    return value
+                except Exception as e:
+                    _LOGGER.warning(
+                        "%s: Failed to parse low tide diff: %s", self.unique_id, e
+                    )
                     return None
         return None
 
@@ -271,7 +322,18 @@ class BshNextLowTideLevelSensor(BshBaseSensor):
         for item in self.coordinator.forecast_data:
             ts = dateutil.parser.parse(item["timestamp"])
             if item["event"] == "NW" and ts > now:
-                return round(item["value"]) if item["value"] is not None else None
+                value = item["value"]
+                try:
+                    level = round(float(value)) if value not in (None, "") else None
+                except (TypeError, ValueError):
+                    _LOGGER.warning(
+                        "%s: Invalid value for low tide level: %s",
+                        self.unique_id,
+                        value,
+                    )
+                    return None
+                _LOGGER.debug("%s: Next low tide level is %s cm", self.unique_id, level)
+                return level
         return None
 
 
@@ -289,7 +351,15 @@ class BshMeanHighWaterLevelSensor(BshBaseSensor):
     @property
     def native_value(self):
         value = self.coordinator.data.get("MHW")
-        return round(value) if value is not None else None
+        try:
+            level = round(float(value)) if value not in (None, "") else None
+        except (TypeError, ValueError):
+            _LOGGER.warning(
+                "%s: Invalid value for mean high water level: %s", self.unique_id, value
+            )
+            return None
+        _LOGGER.debug("%s: Next mean high water level is %s cm", self.unique_id, level)
+        return level
 
 
 class BshMeanLowWaterLevelSensor(BshBaseSensor):
@@ -306,7 +376,15 @@ class BshMeanLowWaterLevelSensor(BshBaseSensor):
     @property
     def native_value(self):
         value = self.coordinator.data.get("MNW")
-        return round(value) if value is not None else None
+        try:
+            level = round(float(value)) if value not in (None, "") else None
+        except (TypeError, ValueError):
+            _LOGGER.warning(
+                "%s: Invalid value for mean low water level: %s", self.unique_id, value
+            )
+            return None
+        _LOGGER.debug("%s: Next mean low water level is %s cm", self.unique_id, level)
+        return level
 
 
 class BshForecastCreatedSensor(BshBaseSensor):
@@ -322,7 +400,9 @@ class BshForecastCreatedSensor(BshBaseSensor):
     @property
     def native_value(self):
         val = self.coordinator.data.get("creation_forecast")
-        return dateutil.parser.parse(val) if val else None
+        value = dateutil.parser.parse(val) if val else None
+        _LOGGER.debug("%s: Forecast was created at %s", self.unique_id, value)
+        return value
 
 
 class BshStationAreaSensor(BshBaseSensor):
@@ -336,4 +416,6 @@ class BshStationAreaSensor(BshBaseSensor):
 
     @property
     def native_value(self):
-        return self.coordinator.data.get("area")
+        value = self.coordinator.data.get("area")
+        _LOGGER.debug("%s: Station area is %s", self.unique_id, value)
+        return value

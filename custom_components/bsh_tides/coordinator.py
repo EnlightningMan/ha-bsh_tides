@@ -23,11 +23,20 @@ class BshTidesCoordinator(DataUpdateCoordinator):
             name=f"BSH Tides ({bshnr})",
             update_interval=SCAN_INTERVAL,
         )
+        _LOGGER.debug("Initialized BshTidesCoordinator for bshnr %s", bshnr)
 
     async def _async_update_data(self):
         try:
-            return await self.api.async_fetch_data()
+            data = await self.api.async_fetch_data()
+            _LOGGER.debug(
+                "Fetched data for %s: station=%s, creation_forecast=%s",
+                self.bshnr,
+                data.get("station_name"),
+                data.get("creation_forecast"),
+            )
+            return data
         except Exception as err:
+            _LOGGER.error("Error updating data for %s: %s", self.bshnr, err)
             raise UpdateFailed(f"Error fetching data: {err}")
 
     @property
