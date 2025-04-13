@@ -5,8 +5,9 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from .const import DOMAIN
+
 from .bsh_api import BshApi
+from .const import DOMAIN
 
 # BSH Api Response gets put into a sensor
 _PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -19,6 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: BshTidesConfigEntry) -> 
     """Set up BSH Tides for Germany from a config entry."""
 
     # Create API instance for correct BSHNR (validates connection)
+    # TODO kann evtl aufgeräumt werden, jetzt wo wir den coordinator benutzen.
     api = BshApi(entry.data["bshnr"])
 
     # runtime_data contains the entity specific config as long as the entity exists.

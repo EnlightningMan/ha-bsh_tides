@@ -14,7 +14,14 @@ Creates Home Assistant devices and sensors for multiple data points:
 
 📡 **Data Source**
 
-The [BSH Tide Data](https://wasserstand-nordsee.bsh.de/) provides tide data for the German North Sea costal region including measuring points for tide affected rivers (Ems, Weser, Elbe, Hunte, etc). Check link for supported gauging stations.
+The [BSH Tide Data](https://wasserstand-nordsee.bsh.de/) provides tide data for the German North Sea costal region including measuring points for tide affected rivers: 
+- Ems, 
+- Weser,
+- Elbe,
+- Jade und Ostfriesland,
+-  Nordfriesland bis Elbmündung (inkl. Helgoland)
+
+Check [link](https://wasserstand-nordsee.bsh.de/) for supported gauging stations.
 
 Data © Bundesamt für Seeschifffahrt und Hydrographie (BSH)
 
