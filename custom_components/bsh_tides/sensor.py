@@ -10,6 +10,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     # SensorEntityDescription,
 )
+from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -18,8 +19,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .__init__ import BshTidesConfigEntry
 from .const import DOMAIN
 from .coordinator import BshTidesCoordinator
-
-# from .bsh_api import BshApi
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,6 +79,7 @@ class BshNextTideTimeSensor(BshBaseSensor):
     """Sensor for the next tide time according to live forecast."""
 
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:clock"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -98,7 +98,8 @@ class BshNextTideLevelSensor(BshBaseSensor):
     """Sensor for the next tide level in cm according to live forecast."""
 
     _attr_device_class = SensorDeviceClass.DISTANCE
-    _attr_native_unit_of_measurement = "cm"
+    _attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+    _attr_icon = "mdi:waves"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -116,7 +117,8 @@ class BshNextTideLevelSensor(BshBaseSensor):
 class BshNextTideDiffSensor(BshBaseSensor):
     """Sensor for relative difference to the mean tide level in m according to live forecast."""
 
-    _attr_native_unit_of_measurement = "m"
+    _attr_native_unit_of_measurement = UnitOfLength.METERS
+    _attr_icon = "mdi:arrow-expand-vertical"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -143,6 +145,7 @@ class BshNextTideDiffSensor(BshBaseSensor):
 
 class BshNextHighTideTimeSensor(BshBaseSensor):
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:clock"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -160,7 +163,8 @@ class BshNextHighTideTimeSensor(BshBaseSensor):
 class BshNextHighTideDiffSensor(BshBaseSensor):
     """Sensor for relative difference to the mean tide level in m according to live forecast."""
 
-    _attr_native_unit_of_measurement = "m"
+    _attr_native_unit_of_measurement = UnitOfLength.METERS
+    _attr_icon = "mdi:arrow-expand-vertical"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -189,7 +193,8 @@ class BshNextHighTideLevelSensor(BshBaseSensor):
     """Sensor for the next high tide level in cm according to live forecast."""
 
     _attr_device_class = SensorDeviceClass.DISTANCE
-    _attr_native_unit_of_measurement = "cm"
+    _attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+    _attr_icon = "mdi:wave-arrow-up"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -206,6 +211,7 @@ class BshNextHighTideLevelSensor(BshBaseSensor):
 
 class BshNextLowTideTimeSensor(BshBaseSensor):
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:clock"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -223,7 +229,8 @@ class BshNextLowTideTimeSensor(BshBaseSensor):
 class BshNextLowTideDiffSensor(BshBaseSensor):
     """Sensor for relative difference to the mean tide level in m according to live forecast."""
 
-    _attr_native_unit_of_measurement = "m"
+    _attr_native_unit_of_measurement = UnitOfLength.METERS
+    _attr_icon = "mdi:arrow-expand-vertical"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -252,7 +259,8 @@ class BshNextLowTideLevelSensor(BshBaseSensor):
     """Sensor for the next low tide level in cm according to live forecast."""
 
     _attr_device_class = SensorDeviceClass.DISTANCE
-    _attr_native_unit_of_measurement = "cm"
+    _attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+    _attr_icon = "mdi:wave-arrow-down"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -272,7 +280,8 @@ class BshMeanHighWaterLevelSensor(BshBaseSensor):
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.DISTANCE
-    _attr_native_unit_of_measurement = "cm"
+    _attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+    _attr_icon = "mdi:waves"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -288,7 +297,8 @@ class BshMeanLowWaterLevelSensor(BshBaseSensor):
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.DISTANCE
-    _attr_native_unit_of_measurement = "cm"
+    _attr_native_unit_of_measurement = UnitOfLength.CENTIMETERS
+    _attr_icon = "mdi:waves"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -304,6 +314,7 @@ class BshForecastCreatedSensor(BshBaseSensor):
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:clock"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
@@ -318,6 +329,7 @@ class BshStationAreaSensor(BshBaseSensor):
     """Contains the area of the station, e.g. Elbe for St. Pauli."""
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:map-marker"
 
     def __init__(self, coordinator: BshTidesCoordinator, translation_key: str):
         super().__init__(coordinator, translation_key)
