@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "station": {
+        "title": "Messstation auswählen",
+        "description": "Wähle die Pegelstation, die du überwachen möchtest.",
+        "data": {
+          "bshnr": "Messstation"
+        }
+      },
+      "user": {
+        "title": "Region auswählen",
+        "data": {
+          "area": "Region"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zur BSH API fehlgeschlagen. Bitte versuche es erneut."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "forecast_created_at": {
+        "name": "Prognose von"
+      },
+      "station_area": {
+        "name": "Region"
+      },
+      "next_tide_time": {
+        "name": "Nächste Gezeitenzeit"
+      },
+      "next_tide_level": {
+        "name": "Nächster Pegelstand"
+      },
+      "next_tide_diff": {
+        "name": "Abweichung zum mittleren Pegelstand"
+      },
+      "next_high_tide_time": {
+        "name": "Nächstes Hochwasser"
+      },
+      "next_high_tide_level": {
+        "name": "Nächster Hochwasser-Pegelstand"
+      },
+      "next_high_tide_diff": {
+        "name": "Nächste Hochwasser Abweichung zum mittleren Hochwasser"
+      },
+      "next_low_tide_time": {
+        "name": "Nächstes Niedrigwasser"
+      },
+      "next_low_tide_level": {
+        "name": "Nächster Niedrigwasser-Pegelstand"
+      },
+      "next_low_tide_diff": {
+        "name": "Nächste Niedrigwasser Abweichung zum mittleren Niedrigwasser"
+      },
+      "mean_high_water_level": {
+        "name": "Mittleres Hochwasser"
+      },
+      "mean_low_water_level": {
+        "name": "Mittleres Niedrigwasser"
+      }
+    }
+  }
+}

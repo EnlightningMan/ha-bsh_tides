@@ -16,21 +16,10 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# Required input is the "Pegel-Nr." / "bshnr" from https://wasserstand-nordsee.bsh.de/
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(
-            "bshnr"
-        ): str,  # BshNr is the BSH number for the tide station. E.g. DE__714P for Schulau
-    }
-)
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
-    """Validate the user input allows us to connect.
-
-    Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
-    """
+    """Validate the user selected an existing station."""
 
     # Check for bshnr being valid by contacting BSH endpoint
     try:
@@ -42,34 +31,60 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         )
         raise CannotConnect
 
-    # TODO
-    # Erfolgreiche Validierung, gib die zu speichernden Daten zurück
+    # Method returns the values that are being stored for the integration
     return {"bshnr": data["bshnr"], "title": data["station_name"]}
 
 
-class ConfigFlow(ConfigFlow, domain=DOMAIN):
+class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for BSH Tides for Germany."""
 
     VERSION = 1
 
-    async def async_step_user(
+    async def async_step_user(        
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle the initial step."""
+        """The initial step of the config flow is to select the area (e.g. Elbe or Weser) so the 2nd step can filter the available stations."""
+
+        if user_input is not None:
+            self.area = user_input["area"]
+            return await self.async_step_station()
+
+        self.station_map = await BshApi.fetch_station_list()
+        areas = sorted(set(area for _, _, area in self.station_map))
+        schema = vol.Schema({vol.Required("area"): vol.In(areas)})
+
+        return self.async_show_form(step_id="user", data_schema=schema)
+
+    async def async_step_station(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """The area is used as filter, now select the Gauge station in a drop down with key=bshnr and value=station_name."""
         errors: dict[str, str] = {}
+
         if user_input is not None:
             try:
-                info = await validate_input(self.hass, user_input)
+                info = await validate_input(
+                    self.hass, {"bshnr": user_input["Gauge Station"]}
+                )
             except CannotConnect:
                 errors["base"] = "cannot_connect"
             except Exception:
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
             else:
-                return self.async_create_entry(title=info["title"], data=user_input)
+                return self.async_create_entry(
+                    title=info["title"], data={"bshnr": user_input["Gauge Station"]}
+                )
 
+        # Create (bshnr: name) mapping for the dropdown. From the station map containung (bshnr, name, area) tuples
+        # and filter for previously selected area
+        options = {
+            bshnr: name for bshnr, name, area in self.station_map if area == self.area
+        }
+
+        schema = vol.Schema({vol.Required("Gauge Station"): vol.In(options)})
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="station", data_schema=schema, errors=errors
         )
 
 

@@ -1,21 +1,65 @@
 {
     "config": {
-        "abort": {
-            "already_configured": "Device is already configured"
+      "step": {
+        "station": {
+          "title": "Select Gauge Station",
+          "description": "Choose the gauge station you want to monitor.",
+          "data": {
+            "bshnr": "Gauge Station"
+          }
         },
-        "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "host": "Host",
-                    "password": "Password",
-                    "username": "Username"
-                }
-            }
+        "user": {
+          "title": "Select Area",
+          "data": {
+            "area": "Region"
+          }
         }
+      },
+      "error": {
+        "cannot_connect": "Could not connect to BSH API. Please try again."
+      }
+    },
+    "entity": {
+      "sensor": {
+        "forecast_created_at": {
+          "name": "Forecast Created At"
+        },
+        "station_area": {
+          "name": "Station Area"
+        },
+        "next_tide_time": {
+          "name": "Next Tide Time"
+        },
+        "next_tide_level": {
+          "name": "Next Tide Level"
+        },
+        "next_tide_diff": {
+          "name": "Next Tide Diff to Mean"
+        },
+        "next_high_tide_time": {
+          "name": "Next High Tide Time"
+        },
+        "next_high_tide_level": {
+          "name": "Next High Tide Level"
+        },
+        "next_high_tide_diff": {
+          "name": "Next High Tide Diff to Mean"
+        },
+        "next_low_tide_time": {
+          "name": "Next Low Tide Time"
+        },
+        "next_low_tide_level": {
+          "name": "Next Low Tide Level"
+        },
+        "next_low_tide_diff": {
+          "name": "Next Low Tide Diff to Mean"
+        },
+        "mean_high_water_level": {
+          "name": "Mean High Water Level"
+        },
+        "mean_low_water_level": {
+          "name": "Mean Low Water Level"
+        }
+      }
     }
 }
