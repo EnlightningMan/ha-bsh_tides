@@ -6,12 +6,9 @@
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/EnlightningMan/bsh_tides",
-  "homekit": {},
+  "documentation": "https://github.com/EnlightningMan/ha-bsh_tides",
+  "issue_tracker": "https://github.com/EnlightningMan/ha-bsh_tides/issues",
   "iot_class": "cloud_polling",
-  "quality_scale": "bronze",
-  "requirements": [],
-  "ssdp": [],
-  "zeroconf": [],
+  "requirements": ["aiohttp>=3.11.0"],
   "version": "0.0.1"
 }

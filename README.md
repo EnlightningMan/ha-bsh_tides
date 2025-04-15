@@ -1,6 +1,13 @@
+[![GitHub Release][releases-shield]][releases]
+[![License][license-shield]](LICENSE)
+[![hacs][hacsbadge]](hacs)
+
+
 # BSH Tides for Germany Integration for Home Assistant
 
 Custom integration to fetch tidal forecast data from the German Federal Maritime and Hydrographic Agency / the Bundesamt für Seeschifffahrt und Hydrographie (BSH).
+
+DISCLAIMER: This project is a private open source project and doesn't have any connection with BSH. The integration utilizes a public but uncommented API of the BSH. It might break or vanish in the future.
 
 🌊 **Features**
 
@@ -27,8 +34,6 @@ The [BSH Tide Data](https://wasserstand-nordsee.bsh.de/) provides tide data for 
 Check [link](https://wasserstand-nordsee.bsh.de/) for supported gauging stations.
 
 Data © Bundesamt für Seeschifffahrt und Hydrographie (BSH)
-
-Disclaimer: The integration utilizes a public but uncommented API of the BSH. It might break or vanish in the future.
 
 ## 🔧 Installation
 
@@ -58,3 +63,12 @@ You can copy these into your dashboard using the YAML editor.
 
 - Data: © BSH – Bundesamt für Seeschifffahrt und Hydrographie  
 - Integration: MIT License
+
+
+[hacs]: https://github.com/custom-components/hacs
+[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/custom-components/blueprint.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/release/EnlightningMan/ha-bsh_tides.svg?style=for-the-badge
+[releases]: https://github.com/EnlightningMan/ha-bsh_tides/releases
+[downloads-shield]: https://img.shields.io/github/downloads/EnlightningMan/ha-bsh_tides/latest/total.svg?style=for-the-badge
+[downloads-all-shield]: https://img.shields.io/github/downloads/EnlightningMan/ha-bsh_tides/total.svg?style=for-the-badge

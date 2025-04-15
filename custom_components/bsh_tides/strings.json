@@ -27,11 +27,21 @@
       "station_area": {
         "name": "Station Area"
       },
+      "next_tide_time": {
+        "name": "Next Tide Time"
+      },
       "next_tide_level": {
         "name": "Next Tide Level"
       },
       "next_tide_diff": {
         "name": "Next Tide Diff to Mean"
+      },
+      "next_tide_event": {
+        "name": "Next Tide Event",
+        "state": {
+          "high_tide": "High Tide",
+          "low_tide": "Low Tide"
+        }
       },
       "next_high_tide_time": {
         "name": "Next High Tide Time"
