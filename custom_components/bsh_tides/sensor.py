@@ -37,6 +37,7 @@ async def async_setup_entry(
         BshTideEventTimeSensor(coordinator),
         BshTideEventTimeSensor(coordinator, TideEvent.HIGH),
         BshTideEventTimeSensor(coordinator, TideEvent.LOW),
+        BshNextTideEventSensor(coordinator),
         BshTideLevelSensor(coordinator),
         BshTideLevelSensor(coordinator, TideEvent.HIGH),
         BshTideLevelSensor(coordinator, TideEvent.LOW),
@@ -62,7 +63,7 @@ class BshBaseSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self._attr_device_info = {
             "identifiers": {(DOMAIN, coordinator.bshnr)},
-            "name": f"BSH Station {coordinator.station_name}",
+            "name": f"BSH {coordinator.station_name}",
             "manufacturer": "BSH",
             "entry_type": "service",
         }
@@ -198,6 +199,31 @@ class BshTideDiffSensor(BshBaseSensor):
                         "%s: Failed to parse tide diff: %s", self.unique_id, e
                     )
                     return None
+        return None
+
+
+class BshNextTideEventSensor(BshBaseSensor):
+    """Sensor for the next tide event (specifies: 'high_tide' or 'low_tide')."""
+
+    _attr_icon = "mdi:arrow-split-horizontal"
+    _attr_translation_key = "next_tide_event"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = ["high_tide", "low_tide"]
+
+    def __init__(self, coordinator: BshTidesCoordinator):
+        super().__init__(coordinator)
+
+    @property
+    def native_value(self) -> str | None:
+        now = datetime.now(UTC)
+        for item in self.coordinator.forecast_data:
+            ts = dateutil.parser.parse(item["timestamp"])
+            if ts > now:
+                event = item.get("event")
+                if event == TideEvent.HIGH.value:
+                    return "high_tide"
+                if event == TideEvent.LOW.value:
+                    return "low_tide"
         return None
 
 

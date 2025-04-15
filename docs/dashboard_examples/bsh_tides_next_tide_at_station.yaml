@@ -1,0 +1,33 @@
+type: custom:mushroom-template-card
+primary: >
+  Hamburg, St. Pauli ({{ states('sensor.bsh_hamburg_st_pauli_elbe_station_area')
+  }})
+secondary: >
+  {% set event = {
+    'high_tide': 'High Tide',
+    'low_tide': 'Low Tide'
+  }[states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_event')] %}
+
+  {% set time = states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_time') %}
+
+  Next Tide: {{ event }} – {{ as_timestamp(time) | timestamp_custom('%d.%m.%Y
+  %H:%M') }}
+icon: mdi:wave
+badge_icon: >
+  {% if states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_event') ==
+  'high_tide' %}
+    mdi:arrow-collapse-up
+  {% else %}
+    mdi:arrow-collapse-down
+  {% endif %}
+badge_color: >
+  {% if states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_event') ==
+  'high_tide' %}
+    blue
+  {% else %}
+    teal
+  {% endif %}
+multiline_secondary: true
+tap_action:
+  action: more-info
+entity: sensor.bsh_hamburg_st_pauli_elbe_next_tide_time

@@ -5,6 +5,7 @@ from custom_components.bsh_tides.const import TideEvent
 from custom_components.bsh_tides.sensor import (
     BshForecastCreatedSensor,
     BshMeanWaterLevelSensor,
+    BshNextTideEventSensor,
     BshStationAreaSensor,
     BshTideDiffSensor,
     BshTideLevelSensor,    
@@ -190,3 +191,22 @@ def test_station_area_sensor_value(dummy_coordinator):
     value = sensor.native_value
     assert isinstance(value, str)
     assert value == "dummy_area"
+
+# --- Tests: BshNextTideEventSensor --- #
+
+def test_next_tide_event_sensor_value(dummy_coordinator):
+    sensor = BshNextTideEventSensor(dummy_coordinator)
+    assert sensor.native_value == "high_tide"
+
+def test_next_tide_event_sensor_value_low(dummy_coordinator):
+    sensor = BshNextTideEventSensor(dummy_coordinator)
+    dummy_coordinator.forecast_data[0]["event"] = "NW"
+    assert sensor.native_value == "low_tide"    
+
+def test_next_tide_event_sensor_unique_id(dummy_coordinator):
+    sensor = BshNextTideEventSensor(dummy_coordinator)
+    assert sensor.unique_id == "bsh_dummy_station_next_tide_event"
+
+def test_next_tide_event_sensor_translation_key(dummy_coordinator):
+    sensor = BshNextTideEventSensor(dummy_coordinator)
+    assert sensor.translation_key == "next_tide_event"

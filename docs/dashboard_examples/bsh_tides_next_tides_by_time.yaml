@@ -1,0 +1,43 @@
+type: custom:mushroom-template-card
+primary: Next Tides (by time)
+secondary: >
+  {% set hw_time =
+  as_datetime(states('sensor.bsh_hamburg_st_pauli_elbe_next_high_tide_time')) %}
+  {% set nw_time =
+  as_datetime(states('sensor.bsh_hamburg_st_pauli_elbe_next_low_tide_time')) %}
+  {% set hw_level =
+  states('sensor.bsh_hamburg_st_pauli_elbe_next_high_tide_level') %} {% set
+  nw_level = states('sensor.bsh_hamburg_st_pauli_elbe_next_low_tide_level') %}
+
+  {% if hw_time < nw_time %} High tide: {{ as_local(hw_time) | as_timestamp |
+  timestamp_custom('%d.%m. %H:%M') }} – Level: {{ hw_level }} cm
+
+  Low tide:  {{ as_local(nw_time) | as_timestamp | timestamp_custom('%d.%m.
+  %H:%M') }} – Level: {{ nw_level }} cm
+
+  {% else %}
+
+  Low tide:  {{ as_local(nw_time) | as_timestamp | timestamp_custom('%d.%m.
+  %H:%M') }} – Level: {{ nw_level }} cm
+
+  High tide: {{ as_local(hw_time) | as_timestamp | timestamp_custom('%d.%m.
+  %H:%M') }} – Level: {{ hw_level }} cm {% endif %}
+multiline_secondary: true
+icon: mdi:wave
+badge_icon: >
+  {% set event = states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_event') %}
+  {% if event == 'high_tide' %}
+    mdi:arrow-collapse-up
+  {% else %}
+    mdi:arrow-collapse-down
+  {% endif %}
+badge_color: >
+  {% set event = states('sensor.bsh_hamburg_st_pauli_elbe_next_tide_event') %}
+  {% if event == 'high_tide' %}
+    blue
+  {% else %}
+    teal
+  {% endif %}
+tap_action:
+  action: more-info
+entity: sensor.bsh_hamburg_st_pauli_elbe_next_tide_event

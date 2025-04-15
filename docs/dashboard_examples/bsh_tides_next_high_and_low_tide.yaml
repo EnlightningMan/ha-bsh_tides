@@ -1,0 +1,15 @@
+type: custom:mushroom-template-card
+primary: Next High & Low Tide
+secondary: >
+  High Tide: {{ states('sensor.bsh_hamburg_st_pauli_elbe_next_high_tide_time') |
+  as_timestamp | timestamp_custom('%d.%m. %H:%M') }} – Pegel: {{
+  states('sensor.bsh_hamburg_st_pauli_elbe_next_high_tide_level') }} cm
+
+  Low Tide:  {{ states('sensor.bsh_hamburg_st_pauli_elbe_next_low_tide_time') |
+  as_timestamp | timestamp_custom('%d.%m. %H:%M') }} – Pegel: {{
+  states('sensor.bsh_hamburg_st_pauli_elbe_next_low_tide_level') }} cm
+multiline_secondary: true
+icon: mdi:chart-timeline-variant-shimmer
+tap_action:
+  action: more-info
+entity: sensor.bsh_hamburg_st_pauli_elbe_next_high_tide_time

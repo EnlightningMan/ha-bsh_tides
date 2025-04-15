@@ -36,6 +36,13 @@
       "next_tide_diff": {
         "name": "Abweichung zum mittleren Pegelstand"
       },
+      "next_tide_event": {
+        "name": "Nächstes Tide-Ereignis",
+        "state": {
+          "high_tide": "Hochwasser",
+          "low_tide": "Niedrigwasser"
+        }
+      },
       "next_high_tide_time": {
         "name": "Nächstes Hochwasser"
       },
