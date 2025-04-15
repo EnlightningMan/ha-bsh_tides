@@ -7,8 +7,11 @@ __pycache__/
 *.eggs/
 *.log
 
+#pytest
+.coverage
+
+
 # VS Code
-.vscode/
 *.code-workspace
 
 # macOS / Windows

@@ -1,0 +1,1 @@
+"""Tests for the BSH Tides for Germany integration."""

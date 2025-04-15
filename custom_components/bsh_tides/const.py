@@ -1,4 +1,9 @@
 """Constants for the BSH Tides for Germany integration."""
 
+from enum import Enum
+
 DOMAIN = "bsh_tides"
-CONF_BSHNR = "bshnr"
+
+class TideEvent(str, Enum):
+    HIGH = "HW"
+    LOW = "NW"
