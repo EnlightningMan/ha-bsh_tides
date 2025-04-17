@@ -16,7 +16,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Could not connect to BSH API. Please try again."
+      "cannot_connect": "Could not connect to BSH API. Please check logs and try again.",
+      "unknown": "Unexpected error. Please check your logs."
     }
   },
   "entity": {

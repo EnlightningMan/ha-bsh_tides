@@ -142,6 +142,11 @@ def test_low_tide_diff_sensor_value(dummy_coordinator):
     assert isinstance(value, int)
     assert value == 0
 
+def test_tide_diff_sensor_invalid_forecast(dummy_coordinator):
+    dummy_coordinator.forecast_data[0]["forecast"] = "not a number"
+    sensor = BshTideDiffSensor(dummy_coordinator, TideEvent.HIGH)
+    assert sensor.native_value is None
+
 # --- Tests: BshMeanWaterLevelSensor --- #
 
 def test_mean_high_water_level_sensor_keys(dummy_coordinator):

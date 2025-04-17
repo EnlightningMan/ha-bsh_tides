@@ -2,36 +2,43 @@
 
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntry
+import logging
+
+from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .bsh_api import BshApi
 from .const import DOMAIN
+from .coordinator import BshTidesCoordinator
+
+_LOGGER = logging.getLogger(__name__)
 
 # BSH Api Response gets put into a sensor
 _PLATFORMS: list[Platform] = [Platform.SENSOR]
 
-# Create ConfigEntry type alias with API object
-type BshTidesConfigEntry = ConfigEntry[BshApi]
 
-
-async def async_setup_entry(hass: HomeAssistant, entry: BshTidesConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up BSH Tides for Germany from a config entry."""
 
-    # Create API instance for correct BSHNR (validates connection)
-    # TODO kann evtl aufgeräumt werden, jetzt wo wir den coordinator benutzen.
-    api = BshApi(entry.data["bshnr"])
+    bshnr = entry.data["bshnr"]
+    coordinator = BshTidesCoordinator(hass, bshnr)
 
-    # runtime_data contains the entity specific config as long as the entity exists.
-    # The bsh endpoint is config specific, so it makes sense to keep in the runtime data.
-    entry.runtime_data = {"api": api}
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        _LOGGER.warning("Initial data fetch failed: %s", err)
+        raise ConfigEntryNotReady(f"BSH Tides update failed: {err}") from err
+
+    # Register coordinator in hass.data[DOMAIN][entry.entry_id]
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, _PLATFORMS)
-
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: BshTidesConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, _PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, _PLATFORMS)
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+    return unload_ok

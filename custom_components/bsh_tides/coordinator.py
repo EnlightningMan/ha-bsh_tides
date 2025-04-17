@@ -7,6 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .bsh_api import BshApi
+from .exceptions import BshApiError
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=60)
@@ -35,9 +36,12 @@ class BshTidesCoordinator(DataUpdateCoordinator):
                 data.get("creation_forecast"),
             )
             return data
+        except BshApiError as err:
+            _LOGGER.warning("BSH API error while updating data: %s", err)
+            raise UpdateFailed(f"BSH API error: {err}") from err
         except Exception as err:
-            _LOGGER.error("Error updating data for %s: %s", self.bshnr, err)
-            raise UpdateFailed(f"Error fetching data: {err}")
+            _LOGGER.exception("Unexpected error during update: %s", err)
+            raise UpdateFailed(f"Unexpected error: {err}") from err
 
     @property
     def station_name(self) -> str:

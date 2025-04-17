@@ -9,32 +9,21 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
 
 from .bsh_api import BshApi
 from .const import DOMAIN
+from .exceptions import BshCannotConnect, BshInvalidStation
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user selected an existing station."""
-
     _LOGGER.debug("Validating BSH station input: %s", data["bshnr"])
-
-    # Check for bshnr being valid by contacting BSH endpoint
-    try:
-        api = BshApi(data["bshnr"])
-        data = await api.async_fetch_data()  # result is returned for valid bshnr
-    except Exception as e:
-        _LOGGER.error(
-            "Exception trying to connect BSH API for bshnr %s: %s", data["bshnr"], e
-        )
-        raise CannotConnect
-
-    _LOGGER.debug("Validation successful for station: %s", data["station_name"])
-    # Method returns the values that are being stored for the integration
-    return {"bshnr": data["bshnr"], "title": data["station_name"]}
+    api = BshApi(data["bshnr"])
+    forecast_data = await api.async_fetch_data()
+    _LOGGER.debug("Validation successful for station: %s", forecast_data["station_name"])
+    return {"bshnr": data["bshnr"], "title": forecast_data["station_name"]}
 
 
 class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -47,12 +36,25 @@ class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Select the area (e.g. Elbe or Weser) so the 2nd step can filter the available stations."""
         _LOGGER.debug("Starting config flow: step_user")
+        errors: dict[str, str] = {}
+
         if user_input is not None:
             self.area = user_input["area"]
             _LOGGER.debug("User selected area: %s", self.area)
             return await self.async_step_station()
 
-        self.station_map = await BshApi.fetch_station_list()
+        # Fetch the list of available stations from the BSH API
+        try:
+            self.station_map = await BshApi.fetch_station_list()
+        except BshCannotConnect:
+            _LOGGER.exception("Cannot connect to BSH API to fetch station list")
+            errors["base"] = BshCannotConnect.code
+            return self.async_show_form(
+                step_id="user",
+                data_schema=vol.Schema({vol.Required("area"): str}),
+                errors=errors,
+            )
+
         areas = sorted(set(area for _, _, area in self.station_map))
         _LOGGER.debug("Available areas: %s", areas)
         schema = vol.Schema({vol.Required("area"): vol.In(areas)})
@@ -70,13 +72,14 @@ class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
                 info = await validate_input(
                     self.hass, {"bshnr": user_input["Gauge Station"]}
                 )
-            except CannotConnect as e:
-                _LOGGER.warning("Cannot connect to BSH API for bshnr: %s, %s", bshnr, e)
-                errors["base"] = "cannot_connect"
-            except Exception as e:
-                _LOGGER.exception(
-                    "Unexpected exception during station validation: %s", e
-                )
+            except BshCannotConnect:
+                _LOGGER.exception("Cannot connect to BSH API")
+                errors["base"] = BshCannotConnect.code
+            except BshInvalidStation:
+                _LOGGER.exception("Invalid station data received")
+                errors["base"] = BshInvalidStation.code
+            except Exception:
+                _LOGGER.exception("Unexpected exception during station validation")
                 errors["base"] = "unknown"
             else:
                 _LOGGER.info("Creating entry for station: %s", info["title"])
@@ -97,7 +100,3 @@ class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="station", data_schema=schema, errors=errors
         )
-
-
-class CannotConnect(HomeAssistantError):
-    """Error to indicate we cannot connect."""

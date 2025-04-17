@@ -10,13 +10,13 @@ from homeassistant.components.sensor import (
     SensorEntity,
     # SensorEntityDescription,
 )
+from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .__init__ import BshTidesConfigEntry
 from .const import DOMAIN, TideEvent
 from .coordinator import BshTidesCoordinator
 
@@ -25,13 +25,15 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: BshTidesConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ):
-    bshnr = entry.data["bshnr"]
-    coordinator = BshTidesCoordinator(hass, bshnr)
+    coordinator: BshTidesCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        raise ConfigEntryNotReady(f"BSH Tides update failed: {err}") from err
 
     entities = [
         BshTideEventTimeSensor(coordinator),

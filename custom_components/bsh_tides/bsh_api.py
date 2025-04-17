@@ -1,6 +1,8 @@
 import aiohttp
 import logging
 
+from .exceptions import BshApiError, BshCannotConnect, BshInvalidStation
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -15,28 +17,39 @@ class BshApi:
         self.api_url = f"https://wasserstand-nordsee.bsh.de/data/DE__{bshnr}.json"
 
     async def async_fetch_data(self):
-        """Asynchronously fetch tide data from the BSH API."""
+        """Fetch tide data for a given station."""
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(self.api_url) as response:
-                    response.raise_for_status()  # Raise an error for bad status codes
-                    return await response.json()
+                async with session.get(self.api_url, ssl=False) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+                    if "station_name" not in data or "gauges" in data:
+                        raise BshInvalidStation(f"Invalid station data: {data}")
+                    return data
         except aiohttp.ClientError as e:
-            _LOGGER.error("Error fetching BSH tide data: %s", e)
-            raise Exception(f"Error fetching BSH tide data: {e}")
+            _LOGGER.debug("aiohttp.ClientError: %s", e)
+            raise BshCannotConnect("Could not connect to BSH API") from e
+        except ValueError as e:
+            _LOGGER.debug("Invalid JSON in station data: %s", e)
+            raise BshApiError("Invalid JSON in response") from e
 
     @staticmethod
     async def fetch_station_list() -> list[tuple[str, str, str]]:
         """Fetch all available stations with (bshnr, station_name, area) for config_flow."""
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(BshApi.MAP_URL) as response:
+                async with session.get(BshApi.MAP_URL, ssl=False) as response:
                     response.raise_for_status()
                     data = await response.json()
+                    if "gauges" not in data:
+                        raise BshInvalidStation("Missing 'gauges' in station list")
                     return [
                         (entry["bshnr"], entry["station_name"], entry["area"])
                         for entry in data["gauges"]
                     ]
-        except Exception as e:
-            _LOGGER.error("Error fetching station list from BSH: %s", e)
-            return []
+        except aiohttp.ClientError as e:
+            _LOGGER.debug("aiohttp.ClientError while fetching station list: %s", e)
+            raise BshCannotConnect("Could not connect to BSH station list API") from e
+        except (ValueError, KeyError) as e:
+            _LOGGER.debug("Invalid station list data: %s", e)
+            raise BshApiError("Invalid data in station list response") from e
