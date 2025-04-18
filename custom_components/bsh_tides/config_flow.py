@@ -22,7 +22,9 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     _LOGGER.debug("Validating BSH station input: %s", data["bshnr"])
     api = BshApi(data["bshnr"])
     forecast_data = await api.async_fetch_data()
-    _LOGGER.debug("Validation successful for station: %s", forecast_data["station_name"])
+    _LOGGER.debug(
+        "Validation successful for station: %s", forecast_data["station_name"]
+    )
     return {"bshnr": data["bshnr"], "title": forecast_data["station_name"]}
 
 
@@ -55,7 +57,7 @@ class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )
 
-        areas = sorted(set(area for _, _, area in self.station_map))
+        areas = sorted({area for _, _, area in self.station_map})
         _LOGGER.debug("Available areas: %s", areas)
         schema = vol.Schema({vol.Required("area"): vol.In(areas)})
 
@@ -90,7 +92,12 @@ class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
         # Create (bshnr: name) mapping for the dropdown. From the station map containung (bshnr, name, area) tuples
         # and filter for previously selected area
         options = {
-            bshnr: name for bshnr, name, area in self.station_map if area == self.area
+            bshnr: name
+            for bshnr, name, area in sorted(
+                self.station_map,
+                key=lambda item: item[1],  # sort by station_name
+            )
+            if area == self.area
         }
         _LOGGER.debug(
             "Station options for area %s: %s", self.area, list(options.values())
