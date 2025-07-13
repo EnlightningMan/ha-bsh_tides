@@ -66,6 +66,13 @@
       },
       "mean_low_water_level": {
         "name": "Mittleres Niedrigwasser"
+      },
+      "forecast_type": {
+        "name": "Vorhersagentyp",
+        "state": {
+          "peak_value_forecast": "Scheitelwertvorhersage",
+          "curve_forecast": "Interval Kurvenvorhersage"
+        }
       }
     }
   }

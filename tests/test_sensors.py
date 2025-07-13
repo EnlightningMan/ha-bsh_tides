@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, UTC
 from custom_components.bsh_tides.const import TideEvent
 from custom_components.bsh_tides.sensor import (
     BshForecastCreatedSensor,
+    BshForecastTypeSensor,
     BshMeanWaterLevelSensor,
     BshNextTideEventSensor,
     BshStationAreaSensor,
@@ -15,24 +16,41 @@ from custom_components.bsh_tides.sensor import (
 # --- Fixtures --- #
 
 @pytest.fixture
-def dummy_forecast():
+def dummy_hwnw_forecast():
     return [
         {
             "timestamp": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
             "value": 165.3,
-            "forecast": "+0,3 m",
+            "forecast": 30,
             "event": "HW",
         },
         {
             "timestamp": (datetime.now(UTC) + timedelta(hours=8)).isoformat(),
             "value": 13,
-            "forecast": "+/-0,0 m",
+            "forecast": 0,
             "event": "NW",
         }
     ]
 
 @pytest.fixture
-def dummy_coordinator(dummy_forecast):
+def dummy_curve_forecast():
+    return [
+        {
+            "timestamp": "2025-07-12 20:50:00+02:00",
+            "astro": 770,
+            "curveforecast": 784,
+            "measurement": None
+        },
+        {
+            "timestamp": "2025-07-12 20:51:00+02:00",
+            "astro": 770,
+            "curveforecast": 770,
+            "measurement": None
+        },
+    ]
+
+@pytest.fixture
+def dummy_coordinator(dummy_hwnw_forecast, dummy_curve_forecast):
     class DummyCoordinator:
         def __init__(self):
             self.bshnr = "123P"
@@ -45,8 +63,14 @@ def dummy_coordinator(dummy_forecast):
                 "MHW": 180,
                 "MNW": 90,
                 "creation_forecast": datetime.now(UTC).isoformat(),
+                "hwnw_forecast": {
+                    "data": dummy_hwnw_forecast
+                },
+                "curve_forecast": {
+                    "data": dummy_curve_forecast
+                },
             }
-            self.forecast_data = dummy_forecast
+            self.forecast_data = dummy_hwnw_forecast
     return DummyCoordinator()
 
 # --- Tests: BshNextTideTimeSensor --- #
@@ -215,3 +239,20 @@ def test_next_tide_event_sensor_unique_id(dummy_coordinator):
 def test_next_tide_event_sensor_translation_key(dummy_coordinator):
     sensor = BshNextTideEventSensor(dummy_coordinator)
     assert sensor.translation_key == "next_tide_event"
+
+
+# --- Tests: BshForecastTypeSensor --- #
+
+def test_forecast_type_sensor_value_peak(dummy_coordinator):
+    sensor = BshForecastTypeSensor(dummy_coordinator)
+    value = sensor.native_value
+    assert isinstance(value, str)
+    assert value == "peak_value_forecast"
+
+def test_forecast_type_sensor_value_curve(dummy_coordinator):
+    # remove the hwnw_forecast to make it use curve_forecast
+    del dummy_coordinator.data["hwnw_forecast"]
+    sensor = BshForecastTypeSensor(dummy_coordinator)
+    value = sensor.native_value
+    assert isinstance(value, str)
+    assert value == "curve_forecast"

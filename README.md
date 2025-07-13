@@ -2,11 +2,14 @@
 [![License][license-shield]](LICENSE)
 [![hacs][hacsbadge]](hacs)
 [![hacs][hacs-shield]](https://my.home-assistant.io/redirect/hacs_repository/?owner=EnlightningMan&repository=ha-bsh_tides&category=integration)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support%20me-yellow.svg?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/selbstausloeser)
 
 
 # BSH Tides for Germany Integration for Home Assistant
 
 Custom integration to fetch tidal forecast data from the German Federal Maritime and Hydrographic Agency / the Bundesamt für Seeschifffahrt und Hydrographie (BSH).
+
+For German speaking users, I've written several blog posts about this integration with more examples and details in my blog: https://www.selbstausloeser.de/tag/bsh-tides/
 
 DISCLAIMER: This project is a private open source project and doesn't have any connection with BSH. The integration utilizes a public but uncommented API of the BSH. It might break or vanish in the future.
 
@@ -22,6 +25,8 @@ Creates Home Assistant devices and sensors for multiple data points:
 
 ![BSH Sensors](images/bsh_sensors.png)
 ![BSH Diagnostic Sensors](images/bsh_diagnostic_sensors.png)
+
+If you like this project, consider buying me a coffee ☕ :) [![Buy Me A Coffee](https://buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/selbstausloeser)
 
 📡 **Data Source**
 
@@ -64,7 +69,12 @@ Then
 
 The full list of supported stations can be seen in the map overview at https://wasserstand-nordsee.bsh.de/
 
+Most of the stations support a "peak value forecast" where the BSH data contains explicit times for when the next high and low tide events will occur including their expected deviation from the mean values. Some stations, however, do not contain this explicit data. For these stations we fallback to the curve level forecast which contains a forecast of water levels in 10 minute intervals for the next few days. We find the min/max of these curves to show the best estimate for the actual time of the peak event. Note that this method is less accurate since there are small fluctuations in the water level around the peak time so, they can be +-20 minutes or so off. 
 
+To see which version the selected station supports, check the diagnostics sensor "Forecast Type" which will either be
+
+- `Peak Value Forecast` (for the accurate BSH data), or
+- `Interval Curve Forecast` (for the value extracted from the forecast curve)
 
 ## 🖼️ Visualization & Template Examples
 ![BSH Dashboard Visualization](images/bsh_mushroom_sensors.png)
