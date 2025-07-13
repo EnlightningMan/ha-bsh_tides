@@ -67,6 +67,13 @@
       },
       "mean_low_water_level": {
         "name": "Mean Low Water Level"
+      },
+      "forecast_type": {
+        "name": "Forecast Type",
+        "state": {
+          "peak_value_forecast": "Peak Value Forecast",
+          "curve_forecast": "Interval Curve Forecast"
+        }
       }
     }
   }

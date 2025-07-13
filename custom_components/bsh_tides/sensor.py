@@ -50,6 +50,7 @@ async def async_setup_entry(
         BshMeanWaterLevelSensor(coordinator, TideEvent.LOW),
         BshForecastCreatedSensor(coordinator),
         BshStationAreaSensor(coordinator),
+        BshForecastTypeSensor(coordinator),
     ]
 
     async_add_entities(entities)
@@ -182,16 +183,7 @@ class BshTideDiffSensor(BshBaseSensor):
                 self._event is None or item.get("event") == self._event.value
             ) and ts > now:
                 try:
-                    value = round(
-                        float(
-                            item["forecast"]
-                            .replace(",", ".")
-                            .replace("+/-", "")
-                            .replace("+", "")
-                            .replace(" m", "")
-                        )
-                        * 100.0
-                    )
+                    value = int(item["forecast"])
                     _LOGGER.debug(
                         "%s: Tide diff (%s) is %s m", self.unique_id, self._event, value
                     )
@@ -296,4 +288,28 @@ class BshStationAreaSensor(BshBaseSensor):
     def native_value(self) -> str | None:
         value = self.coordinator.data.get("area")
         _LOGGER.debug("%s: Station area is %s", self.unique_id, value)
+        return value
+
+
+class BshForecastTypeSensor(BshBaseSensor):
+    """Specifies if we are using the 'hwnw' or 'curve' forecast type.
+
+    The "hwnw" forecast type is used for stations that provide actual high/low tide events (peak value forecast).
+    The "curve" forecast type is used for stations that only provide a curve forecast in 10 minute intervals without specific high/low events.
+    """
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:cog"
+    _attr_translation_key = "forecast_type"
+
+    def __init__(self, coordinator: BshTidesCoordinator):
+        super().__init__(coordinator)
+
+    @property
+    def native_value(self) -> str | None:
+        if "hwnw_forecast" in self.coordinator.data:
+            value = "peak_value_forecast"
+        else:
+            value = "curve_forecast"
+        _LOGGER.debug("%s: Station forecast type is %s", self.unique_id, value)
         return value
