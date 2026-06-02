@@ -31,7 +31,9 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 class BshTidesConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for BSH Tides for Germany."""
 
-    VERSION = 1
+    # v2: migrated from the retired wasserstand-nordsee.bsh.de JSON endpoint
+    # (bshnr keys like "111P") to the gdi.bsh.de OGC API (station slugs).
+    VERSION = 2
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
