@@ -11,7 +11,7 @@ Custom integration to fetch tidal forecast data from the German Federal Maritime
 
 For German speaking users, I've written several blog posts about this integration with more examples and details in my blog: https://www.selbstausloeser.de/tag/bsh-tides/
 
-DISCLAIMER: This project is a private open source project and doesn't have any connection with BSH. The integration utilizes a public but uncommented API of the BSH. It might break or vanish in the future.
+DISCLAIMER: This project is a private open source project and doesn't have any connection with BSH. The integration utilizes the BSH's official, documented water level forecast API ([gdi.bsh.de OGC API Features](https://gdi.bsh.de/ldproxy/rest/services/WaterLevelForecast?lang=en)), whose data is provided free of charge under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It might still change or vanish in the future.
 
 🌊 **Features**
 
@@ -30,16 +30,11 @@ If you like this project, consider buying me a coffee ☕ :) [![Buy Me A Coffee]
 
 📡 **Data Source**
 
-The [BSH Tide Data](https://wasserstand-nordsee.bsh.de/) provides tide data for the German North Sea costal region including measuring points for tide affected rivers: 
-- Ems, 
-- Weser,
-- Elbe,
-- Jade und Ostfriesland,
-- Nordfriesland bis Elbmündung (inkl. Helgoland)
+The integration uses the BSH's official [Water Level Forecast OGC API](https://gdi.bsh.de/ldproxy/rest/services/WaterLevelForecast?lang=en). It provides forecast data for both the German **North Sea** coastal region (including tide-affected rivers such as the Ems, Weser, Elbe, Jade und Ostfriesland, Nordfriesland bis Elbmündung) **and the Baltic Sea** (e.g. Kieler Bucht, Lübecker Bucht, Westlich/Östlich Rügens, Kleines Haff).
 
-Check [link](https://wasserstand-nordsee.bsh.de/) for supported gauging stations.
+Check the [BSH water level map](https://wasserstand.bsh.de/) for the supported gauging stations.
 
-Data © Bundesamt für Seeschifffahrt und Hydrographie (BSH)
+Data © Bundesamt für Seeschifffahrt und Hydrographie (BSH), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## 🔧 Installation
 
@@ -67,7 +62,7 @@ Then
 
 ## 📍 Supported Stations
 
-The full list of supported stations can be seen in the map overview at https://wasserstand-nordsee.bsh.de/
+The full list of supported stations can be seen in the map overview at https://wasserstand.bsh.de/
 
 Most of the stations support a "peak value forecast" where the BSH data contains explicit times for when the next high and low tide events will occur including their expected deviation from the mean values. Some stations, however, do not contain this explicit data. For these stations we fallback to the curve level forecast which contains a forecast of water levels in 10 minute intervals for the next few days. We find the min/max of these curves to show the best estimate for the actual time of the peak event. Note that this method is less accurate since there are small fluctuations in the water level around the peak time so, they can be +-20 minutes or so off. 
 
@@ -91,17 +86,8 @@ You can copy these into your dashboard using the YAML editor.
 
 ## 📄 License & Attribution
 
-- Data: © BSH – Bundesamt für Seeschifffahrt und Hydrographie  
+- Data: © BSH – Bundesamt für Seeschifffahrt und Hydrographie, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Integration: MIT License
-
-## 🔐 Note on SSL Certificate Verification
-
-> This integration **disables strict SSL certificate validation** when connecting to the BSH tide API.
-
-While the connection is still **secure and encrypted using HTTPS**, the integration does **not validate the certificate authority (CA)**.  
-This is necessary because the BSH server sometimes presents a certificate chain that fails verification on some systems, including Home Assistant installations and Docker containers.
-
-⚠️ **If you are concerned about this behavior**, you can review the certificate chain manually via [https://wasserstand-nordsee.bsh.de/](https://wasserstand-nordsee.bsh.de/).
 
 [hacs]: https://github.com/custom-components/hacs
 [hacs-shield]: https://img.shields.io/badge/HACS-Install%20via%20HACS-orange?style=for-the-badge&logo=home-assistant
