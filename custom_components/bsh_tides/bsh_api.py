@@ -128,9 +128,7 @@ class BshApi:
         """Fetch and normalise tide data for a single station."""
         try:
             async with aiohttp.ClientSession() as session:
-                # ssl=False kept on purpose: BSH has historically served a
-                # certificate chain that fails to validate inside HAOS/Docker.
-                async with session.get(self.api_url, ssl=False) as response:
+                async with session.get(self.api_url) as response:
                     response.raise_for_status()
                     feature = await response.json(content_type=None)
         except aiohttp.ClientError as e:
@@ -155,7 +153,7 @@ class BshApi:
         try:
             async with aiohttp.ClientSession() as session:
                 for _ in range(_MAX_PAGES):
-                    async with session.get(url, ssl=False) as response:
+                    async with session.get(url) as response:
                         response.raise_for_status()
                         payload = await response.json(content_type=None)
 
