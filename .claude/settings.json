@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest)",
+      "Bash(gh issue *)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -sL -m 20 \"https://wasserstand.bsh.de/\" -w \"\\\\nHTTP %{http_code}\\\\n\" -o /tmp/new_root.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -sL -m 30 \"https://gdi.bsh.de/ldproxy/rest/services/WaterLevelForecast?lang=en\" -w \"\\\\nHTTP %{http_code} ct=%{content_type}\\\\n\" -o /tmp/ld_root.json)",
+      "Bash(curl -sL -m 30 \"https://gdi.bsh.de/ldproxy/rest/services/WaterLevelForecast/collections?lang=en&f=json\" -o /tmp/ld_coll.json -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('/tmp/ld_coll.json'\\)\\);print\\([c['id'] for c in d.get\\('collections',[]\\)]\\);[print\\(c['id'],'-',c.get\\('title'\\)\\) for c in d.get\\('collections',[]\\)]\")",
+      "Bash(curl -fsSL https://claude.com/install.sh)",
+      "Bash(bash)",
+      "Bash(curl -fsSL https://claude.ai/install.sh)"
+    ]
+  }
+}
